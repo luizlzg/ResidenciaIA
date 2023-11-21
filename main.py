@@ -168,7 +168,7 @@ def run():
         trainer = SFTTrainer(
             model=model,
             train_dataset=dataset['train'],
-            eval_dataset=dataset['test'],
+            eval_dataset=dataset['validation'],
             peft_config=peft_config,
             dataset_text_field="text",
             max_seq_length=512,
@@ -235,7 +235,7 @@ def run():
         trainer = SFTTrainer(
             model=model,
             train_dataset=dataset['train'],
-            eval_dataset=dataset['test'],
+            eval_dataset=dataset['validation'],
             peft_config=peft_config,
             dataset_text_field="text",
             max_seq_length=512,
@@ -348,7 +348,7 @@ def run():
 
             train_dataset=dataset['train'],
 
-            eval_dataset=dataset['test'],
+            eval_dataset=dataset['validation'],
 
             peft_config=peft_config,
 
