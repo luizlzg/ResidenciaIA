@@ -149,7 +149,7 @@ def run():
             print(f"Não foi possível criar o diretório {output_path}. Erro: {e}")
             exit(1)
 
-    dataset_teste = load_dataset(args.dataset_name)['test']  # carregando o dataset de teste
+    dataset_teste = load_dataset(args.dataset_name)  # carregando o dataset de teste
 
     # Carregando o modelo e tokenizador:
 
