@@ -161,8 +161,8 @@ def run():
             logging_steps=100,
             learning_rate=2e-4,
             logging_dir=args.log_dir,
-            max_steps=7000,
-            warmup_steps=700,
+            max_steps=2000,
+            warmup_steps=200,
             lr_scheduler_type="linear",
         )
         trainer = SFTTrainer(
@@ -212,7 +212,7 @@ def run():
             r=args.lora_r,
             bias="none",
             task_type="CAUSAL_LM",
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj"]
+            target_modules=["c_attn", "c_proj"]
         )
 
         training_arguments = TrainingArguments(
@@ -228,8 +228,8 @@ def run():
             logging_steps=100,
             learning_rate=2e-4,
             logging_dir=args.log_dir,
-            max_steps=7000,
-            warmup_steps=700,
+            max_steps=2000,
+            warmup_steps=200,
             lr_scheduler_type="linear",
         )
         trainer = SFTTrainer(
@@ -304,7 +304,7 @@ def run():
 
             task_type="CAUSAL_LM",
 
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj"]
+            target_modules=["c_proj", "c_attn"]
 
         )
 
@@ -334,9 +334,9 @@ def run():
 
             logging_dir=args.log_dir,
 
-            max_steps=7000,
+            max_steps=2000,
 
-            warmup_steps=700,
+            warmup_steps=200,
 
             lr_scheduler_type="linear",
 
