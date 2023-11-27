@@ -62,7 +62,7 @@ def compute_ppl(predictions, model, tokenizer, batch_size: int = 8, add_start_to
     ppls = []
     loss_fct = CrossEntropyLoss(reduction="none")
 
-    for start_index in tqdm(range(0, len(encoded_texts), batch_size)):
+    for start_index in range(0, len(encoded_texts), batch_size):
         end_index = min(start_index + batch_size, len(encoded_texts))
         encoded_batch = encoded_texts[start_index:end_index]
         attn_mask = attn_masks[start_index:end_index]
@@ -79,7 +79,10 @@ def compute_ppl(predictions, model, tokenizer, batch_size: int = 8, add_start_to
         labels = encoded_batch
 
         with torch.no_grad():
-            out_logits = model(encoded_batch, attention_mask=attn_mask).logits
+            try:
+                out_logits = model(encoded_batch, attention_mask=attn_mask).logits
+            except:
+                out_logits = model(encoded_batch[:,:1024], attention_mask= attn_mask[:,:1024]).logits
 
         shift_logits = out_logits[..., :-1, :].contiguous()
         shift_labels = labels[..., 1:].contiguous()
@@ -149,11 +152,22 @@ def run():
             print(f"Não foi possível criar o diretório {output_path}. Erro: {e}")
             exit(1)
 
-    dataset_teste = load_dataset(args.dataset_name)['test']  # carregando o dataset de teste
+    dataset_teste = load_dataset(args.dataset_name)['train']  # carregando o dataset de teste
 
     # Carregando o modelo e tokenizador:
 
-    model_name = args.model_name
+    model_name = ""
+
+    if args.model_name == "zephyr":
+        model_name = "HuggingFaceH4/zephyr-7b-beta"
+
+
+    elif args.model_name == "gpt2":
+        model_name = "gpt2"
+
+    elif args.model_name == "distilgpt2":
+        model_name = "distilgpt2"
+
     # Tokenizador
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     tokenizer.pad_token = tokenizer.unk_token
@@ -196,14 +210,14 @@ def run():
     letras = ['A', 'B', 'C', 'D']  # lista para extrair a letra a partir da resposta
 
     # Iterando sobre o dataset de teste
-    for i in range(len(dataset_teste)):
+    for i in tqdm(range(len(dataset_teste))):
 
         # Verificando se é um dataset de múltipla escolha com letras A, B, C e D.
         if dataset_teste[i]['dataset'] in multiples:
 
             # Armazenando as possíveis alternativas
-            alternativas = [dataset_teste[i]['alternativa_a'], dataset_teste[i]['alternativa_b'],
-                            dataset_teste[i]['alternativa_c'], dataset_teste[i]['alternativa_d']]
+            alternativas = [dataset_teste[i]['alternative_a'], dataset_teste[i]['alternative_b'],
+                            dataset_teste[i]['alternative_c'], dataset_teste[i]['alternative_d']]
 
             ppls = []  # lista para armazenar a perplexidade de cada alternativa, visto que a menor perplexidade
             # corresponde à correta
@@ -217,17 +231,17 @@ def run():
                 B_INST, E_INST = "### Instrução:\n", "### Resposta:\n"
 
                 x = dataset_teste[i]['instruction']
-                x += f"A) {dataset_teste[i]['alternativa_a']}"
-                x += f"B) {dataset_teste[i]['alternativa_b']}"
-                x += f"C) {dataset_teste[i]['alternativa_c']}"
-                x += f"D) {dataset_teste[i]['alternativa_d']}"
+                x += f"A) {dataset_teste[i]['alternative_a']}"
+                x += f"B) {dataset_teste[i]['alternative_b']}"
+                x += f"C) {dataset_teste[i]['alternative_c']}"
+                x += f"D) {dataset_teste[i]['alternative_d']}"
 
                 prompt = f"{system_prompt}{B_INST}{x.strip()}\n\n{E_INST}"
                 prompt += alt
 
                 # Calculando a perplexidade:
                 perplexities = compute_ppl(predictions=prompt, model=model, tokenizer=tokenizer,
-                                           add_start_token=False)
+                                           add_start_token=False, max_length=1024)
 
                 ppls.append(perplexities['perplexities'][0])  # Armazenando a perplexidade
 
@@ -259,7 +273,7 @@ def run():
 
                 # Calculando a perplexidade:
                 perplexities = compute_ppl(predictions=prompt, model=model, tokenizer=tokenizer,
-                                           add_start_token=False)
+                                           add_start_token=False, max_length=1024)
 
                 ppls.append(perplexities['perplexities'][0])  # Armazenando a perplexidade
 
