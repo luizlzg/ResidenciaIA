@@ -13,7 +13,14 @@ class LongAnswerAnalysis:
         # fazendo inferencia
         resposta, etc = self.gpt.get_completion()
 
-        resposta = eval(resposta)
+        if len(resposta) > 1 and '5' in resposta:
+            resposta = 5
+        elif len(resposta) > 1 and '3' in resposta:
+            resposta = 3
+        elif len(resposta) > 1 and '0' in resposta:
+            resposta = 0
+        else:
+            resposta = eval(resposta)
 
         self.gpt.reset_messages(maintain_context=False)
 
@@ -26,7 +33,16 @@ class LongAnswerAnalysis:
 
         # fazendo inferencia
         resposta, etc = self.gpt.get_completion()
-        resposta = eval(resposta)
+        if len(resposta) > 1 and '5' in resposta:
+            resposta = 5
+        elif len(resposta) > 1 and '3' in resposta:
+            resposta = 3
+        elif len(resposta) > 1 and '1' in resposta:
+            resposta = 1
+        elif len(resposta) > 1 and '0' in resposta:
+            resposta = 0
+        else:
+            resposta = eval(resposta)
 
         self.gpt.reset_messages(maintain_context=False)
 
@@ -39,7 +55,14 @@ class LongAnswerAnalysis:
 
         # fazendo inferencia
         resposta, etc = self.gpt.get_completion()
-        resposta = eval(resposta)
+        if len(resposta) > 1 and '5' in resposta:
+            resposta = 5
+        elif len(resposta) > 1 and '3' in resposta:
+            resposta = 3
+        elif len(resposta) > 1 and '0' in resposta:
+            resposta = 0
+        else:
+            resposta = eval(resposta)
 
         self.gpt.reset_messages(maintain_context=False)
 
